@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -10,8 +9,6 @@ import (
 )
 
 func main() {
-	yamlFile := flag.String("yaml", "", "The relative path to a yaml file representing path mappings.")
-	flag.Parse()
 
 	mux := defaultMux()
 
@@ -22,17 +19,13 @@ func main() {
 	}
 	mapHandler := urlshortener.MapHandler(pathsToUrls, mux)
 
-	// Build the YAMLHandler using the mapHandler as the
-	// fallback
-
-	yaml := getYaml(*yamlFile)
-	yamlHandler, err := urlshortener.YAMLHandler(yaml, mapHandler)
+	dbHandler, err := urlshortener.DBHanlder(mapHandler)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Starting the server on :8080")
-	http.ListenAndServe(":8080", yamlHandler)
 
+	fmt.Println("Starting the server on :8080")
+	http.ListenAndServe(":8080", dbHandler)
 }
 
 func defaultMux() *http.ServeMux {
