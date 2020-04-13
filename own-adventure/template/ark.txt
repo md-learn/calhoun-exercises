@@ -1,0 +1,9 @@
+{{.Title}}
+
+{{range .Paragraphs}}
+    {{.}}\n   
+{{end}}
+
+{{range .Options}}
+    Press {{.Arc}} to venture {{.Text}}\n
+{{end}}
