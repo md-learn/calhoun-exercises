@@ -8,7 +8,7 @@ import (
 )
 
 // NewStoryArcHandler create a new http handler serving http pages
-func NewStoryArcHandler(story map[string]ownadvModel.StoryArc) http.Handler {
+func NewStoryArcHandler(story ownadvModel.Story) http.Handler {
 	tmpl := template.Must(template.ParseFiles("template/ark.html"))
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -2,9 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 
 	ownadvHandler "github.com/marcodenisi/calhoun_exercises/own-adventure/handler"
 	ownadvModel "github.com/marcodenisi/calhoun_exercises/own-adventure/model"
@@ -22,16 +22,16 @@ func main() {
 	http.ListenAndServe(":8080", mux)
 }
 
-func parseStory() (map[string]ownadvModel.StoryArc, error) {
-	data, err := ioutil.ReadFile("data/gopher.json")
+func parseStory() (ownadvModel.Story, error) {
+	data, err := os.Open("data/gopher.json")
 	if err != nil {
 		log.Fatal("Error while reading json", err)
 	}
 
-	storyMap := make(map[string]ownadvModel.StoryArc)
-	err = json.Unmarshal(data, &storyMap)
-	if err != nil {
+	var story ownadvModel.Story
+	decoder := json.NewDecoder(data)
+	if err := decoder.Decode(&story); err != nil {
 		return nil, err
 	}
-	return storyMap, nil
+	return story, nil
 }
