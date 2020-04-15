@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -11,15 +12,14 @@ import (
 )
 
 func main() {
-	storyMap, err := parseStory()
+	story, err := parseStory()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	mux := http.NewServeMux()
-	mux.Handle("/", ownadvHandler.NewStoryArcHandler(storyMap))
-
-	http.ListenAndServe(":8080", mux)
+	h := ownadvHandler.StoryHandler{Story: story}
+	fmt.Println("Starting server on port 8080")
+	http.ListenAndServe(":8080", h)
 }
 
 func parseStory() (ownadvModel.Story, error) {

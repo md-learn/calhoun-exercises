@@ -7,13 +7,34 @@ import (
 	ownadvModel "github.com/marcodenisi/calhoun_exercises/own-adventure/model"
 )
 
-// NewStoryArcHandler create a new http handler serving http pages
-func NewStoryArcHandler(story ownadvModel.Story) http.Handler {
-	tmpl := template.Must(template.ParseFiles("template/ark.html"))
+var tmplVar = `
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Create your own adventure</title>
+  </head>
+  <body> 
+    <h1>{{.Title}}</h1>
+    {{range .Paragraphs}}
+    <p>{{.}}</p>    
+    {{end}}
+    <ul>
+    {{range .Options}}
+        <li><a href="/{{.Arc}}">{{.Text}}</a></li>
+    {{end}}
+    </ul>
+  </body>
+</html>`
 
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tmpl.Execute(w, story[getArcName(r)])
-	})
+// StoryHandler is an http.Handler containing a story
+type StoryHandler struct {
+	Story ownadvModel.Story
+}
+
+func (h StoryHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.New("arkTmpl").Parse(tmplVar))
+	tmpl.Execute(w, h.Story[getArcName(r)])
 }
 
 func getArcName(r *http.Request) string {
