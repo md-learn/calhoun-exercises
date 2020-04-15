@@ -2,6 +2,7 @@ package handler
 
 import (
 	"html/template"
+	"log"
 	"net/http"
 
 	ownadvModel "github.com/marcodenisi/calhoun_exercises/own-adventure/model"
@@ -34,7 +35,16 @@ type StoryHandler struct {
 
 func (h StoryHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.New("arkTmpl").Parse(tmplVar))
-	tmpl.Execute(w, h.Story[getArcName(r)])
+
+	if chapter, ok := h.Story[getArcName(r)]; ok {
+		err := tmpl.Execute(w, chapter)
+		if err != nil {
+			log.Printf("%v", err)
+			http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		}
+		return
+	}
+	http.Error(w, "Chapter not found", http.StatusNotFound)
 }
 
 func getArcName(r *http.Request) string {
