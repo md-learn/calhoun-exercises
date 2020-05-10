@@ -58,6 +58,7 @@ func getPage(URL string) (io.Reader, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer response.Body.Close()
 	return response.Body, nil
 }
 
