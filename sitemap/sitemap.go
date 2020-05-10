@@ -2,7 +2,6 @@ package sitemap
 
 import (
 	"encoding/xml"
-	"io"
 	"net/http"
 	"strings"
 
@@ -36,12 +35,7 @@ func inspect(URL, baseURL string, visited map[string]bool, depth, current int) {
 	}
 	visited[URL] = true
 
-	r, err := getPage(URL)
-	if err != nil {
-		return
-	}
-
-	foundLinks := link.Parse(r)
+	foundLinks := getLinks(URL)
 	for _, l := range foundLinks {
 		newURL := l.Href
 		// handle relative paths
@@ -53,13 +47,13 @@ func inspect(URL, baseURL string, visited map[string]bool, depth, current int) {
 	}
 }
 
-func getPage(URL string) (io.Reader, error) {
+func getLinks(URL string) []link.Link {
 	response, err := http.Get(URL)
 	if err != nil {
-		return nil, err
+		return []link.Link{}
 	}
 	defer response.Body.Close()
-	return response.Body, nil
+	return link.Parse(response.Body)
 }
 
 func isExternalLink(baseURL, newURL string) bool {
