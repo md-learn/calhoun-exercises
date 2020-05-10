@@ -10,9 +10,9 @@ import (
 )
 
 // Build returns a string representation of a sitemap
-func Build(domain string) string {
+func Build(domain string, depth int) string {
 	visited := map[string]bool{}
-	inspect(domain, domain, visited)
+	inspect(domain, domain, visited, depth, 0)
 
 	urls := urlset{}
 	for k := range visited {
@@ -25,7 +25,11 @@ func Build(domain string) string {
 	return xml.Header + string(b)
 }
 
-func inspect(URL, baseURL string, visited map[string]bool) {
+func inspect(URL, baseURL string, visited map[string]bool, depth, current int) {
+	current++
+	if depth > 0 && depth < current {
+		return
+	}
 
 	if ok := visited[URL]; isExternalLink(baseURL, URL) || ok {
 		return
@@ -45,7 +49,7 @@ func inspect(URL, baseURL string, visited map[string]bool) {
 			newURL = URL + l.Href
 		}
 
-		inspect(newURL, URL, visited)
+		inspect(newURL, URL, visited, depth, current)
 	}
 }
 
